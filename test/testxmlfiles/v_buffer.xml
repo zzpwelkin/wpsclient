@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wps:ProcessDescriptions xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsDescribeProcess_response.xsd" service="WPS" version="1.0.0" xml:lang="en-CA">
+    <ProcessDescription wps:processVersion="1" storeSupported="true" statusSupported="true">
+        <ows:Identifier>v.buffer</ows:Identifier>
+        <ows:Title>Creates a buffer around vector features of given type.</ows:Title>
+        <ows:Abstract>http://grass.osgeo.org/grass70/manuals/html70_user/v.buffer.html</ows:Abstract>
+        <ows:Metadata xlink:title="vector" xlink:href="http://localhost/cgi-bin/wps?service=WPS&amp;request=DescribeProcess&amp;version=1.0.0&amp;identifier=v.buffer"/>
+        <ows:Metadata xlink:title="geometry" xlink:href="http://localhost/cgi-bin/wps?service=WPS&amp;request=DescribeProcess&amp;version=1.0.0&amp;identifier=v.buffer"/>
+        <ows:Metadata xlink:title="buffer" xlink:href="http://localhost/cgi-bin/wps?service=WPS&amp;request=DescribeProcess&amp;version=1.0.0&amp;identifier=v.buffer"/>
+        <DataInputs>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>distance</ows:Identifier>
+                <ows:Title>Buffer distance along major axis in map units</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#float">float</ows:DataType>
+                    <ows:AnyValue/>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>layer</ows:Identifier>
+                <ows:Title>A single vector map can be connected to multiple database tables. This number determines which table to use. Layer name for direct OGR access.</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#string">string</ows:DataType>
+                    <ows:AnyValue/>
+                    <DefaultValue>-1</DefaultValue>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>scale</ows:Identifier>
+                <ows:Title>Scaling factor for attribute column values</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#float">float</ows:DataType>
+                    <ows:AnyValue/>
+                    <DefaultValue>1.0</DefaultValue>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>angle</ows:Identifier>
+                <ows:Title>Angle of major axis in degrees</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#float">float</ows:DataType>
+                    <ows:AnyValue/>
+                    <DefaultValue>0.0</DefaultValue>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>-c</ows:Identifier>
+                <ows:Title>Dont make caps at the ends of polylines</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#boolean">boolean</ows:DataType>
+                    <ows:AllowedValues>
+                            <ows:Value>True</ows:Value>
+                            <ows:Value>False</ows:Value>
+                    </ows:AllowedValues>
+                    <DefaultValue>False</DefaultValue>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>bufcolumn</ows:Identifier>
+                <ows:Title>Name of column to use for buffer distances</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#string">string</ows:DataType>
+                    <ows:AnyValue/>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>tolerance</ows:Identifier>
+                <ows:Title>Maximum distance between theoretical arc and polygon segments as multiple of buffer</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#float">float</ows:DataType>
+                    <ows:AnyValue/>
+                    <DefaultValue>0.01</DefaultValue>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>-s</ows:Identifier>
+                <ows:Title>Make outside corners straight</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#boolean">boolean</ows:DataType>
+                    <ows:AllowedValues>
+                            <ows:Value>True</ows:Value>
+                            <ows:Value>False</ows:Value>
+                    </ows:AllowedValues>
+                    <DefaultValue>False</DefaultValue>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>minordistance</ows:Identifier>
+                <ows:Title>Buffer distance along minor axis in map units</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#float">float</ows:DataType>
+                    <ows:AnyValue/>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="1" maxOccurs="1">
+                <ows:Identifier>input</ows:Identifier>
+                <ows:Title>Data source for direct OGR access</ows:Title>
+                <ComplexData>
+                    <Default>
+                        <Format>
+                            <MimeType>text/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
+                        </Format>
+                    </Default>
+                    <Supported>
+                        <Format>
+                            <MimeType>text/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>application/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>text/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/2.1.2/feature.xsd</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>application/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/2.1.2/feature.xsd</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>text/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/kml/2.2.0/ogckml22.xsd</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>application/dgn</MimeType>
+                            <Encoding>None</Encoding>
+                            <Schema>None</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>application/shp</MimeType>
+                            <Encoding>None</Encoding>
+                            <Schema>None</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>application/x-zipped-shp</MimeType>
+                            <Encoding>None</Encoding>
+                            <Schema>None</Schema>
+                        </Format>
+                    </Supported>
+                </ComplexData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1024">
+                <ows:Identifier>type</ows:Identifier>
+                <ows:Title>Feature type</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#string">string</ows:DataType>
+                    <ows:AllowedValues>
+                            <ows:Value>point</ows:Value>
+                            <ows:Value>line</ows:Value>
+                            <ows:Value>boundary</ows:Value>
+                            <ows:Value>centroid</ows:Value>
+                            <ows:Value>area</ows:Value>
+                    </ows:AllowedValues>
+                    <DefaultValue>point,line,area</DefaultValue>
+                </LiteralData>
+            </Input>
+        </DataInputs>
+        <ProcessOutputs>
+            <Output>
+                <ows:Identifier>output</ows:Identifier>
+                <ows:Title>Name for output vector map</ows:Title>
+                <ComplexOutput>
+                    <Default>
+                        <Format>
+                            <MimeType>text/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
+                        </Format>
+                    </Default>
+                    <Supported>
+                        <Format>
+                            <MimeType>text/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>application/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>text/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/2.1.2/feature.xsd</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>application/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/gml/2.1.2/feature.xsd</Schema>
+                        </Format>
+                        <Format>
+                            <MimeType>text/xml</MimeType>
+                            <Encoding>UTF-8</Encoding>
+                            <Schema>http://schemas.opengis.net/kml/2.2.0/ogckml22.xsd</Schema>
+                        </Format>
+                    </Supported>
+                </ComplexOutput>
+            </Output>
+        </ProcessOutputs>
+    </ProcessDescription>
+</wps:ProcessDescriptions>

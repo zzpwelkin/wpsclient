@@ -176,6 +176,7 @@ class ExecuteRequestStruct(object):
                 inputparam = getInParams(descstruct[1], paramId)
                 if isinstance(inputparam.theInputForm,ComplexDataDef):
                     # set value
+                    input['type'] = 1
                     if not CmdParamToken(value).getIdentifier():
                         input['value'] = value
                     else:
@@ -187,6 +188,7 @@ class ExecuteRequestStruct(object):
                         except:
                                 continue   
                 elif isinstance(inputparam.theInputForm, LiteralInputDef):
+                    input['type'] = 2
                     input['identifier'] = paramId
                     input['value'] = value
                     try:
@@ -198,6 +200,7 @@ class ExecuteRequestStruct(object):
                     except:
                         pass
                 elif isinstance(inputparam, BoundingDataDef):
+                    input['type'] = 3
                     input['value'] = value
                 res['datainputs'] += [input]
             elif getInParams(descstruct[2], paramId):

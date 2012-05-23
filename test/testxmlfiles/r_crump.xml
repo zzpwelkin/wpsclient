@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wps:ProcessDescriptions xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsDescribeProcess_response.xsd" service="WPS" version="1.0.0" xml:lang="en-CA">
+    <ProcessDescription wps:processVersion="1" storeSupported="true" statusSupported="true">
+        <ows:Identifier>r.clump</ows:Identifier>
+        <ows:Title>Recategorizes data in a raster map by grouping cells that form physically discrete areas into unique categories.</ows:Title>
+        <ows:Abstract>http://grass.osgeo.org/grass70/manuals/html70_user/r.clump.html</ows:Abstract>
+        <ows:Metadata xlink:title="raster" xlink:href="http://localhost/cgi-bin/wps?service=WPS&amp;request=DescribeProcess&amp;version=1.0.0&amp;identifier=r.clump"/>
+        <ows:Metadata xlink:title="statistics" xlink:href="http://localhost/cgi-bin/wps?service=WPS&amp;request=DescribeProcess&amp;version=1.0.0&amp;identifier=r.clump"/>
+        <ows:Metadata xlink:title="reclass" xlink:href="http://localhost/cgi-bin/wps?service=WPS&amp;request=DescribeProcess&amp;version=1.0.0&amp;identifier=r.clump"/>
+        <DataInputs>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>grass_resolution_ns</ows:Identifier>
+                <ows:Title>Resolution of the mapset in north-south direction in meters or degrees</ows:Title>
+                <ows:Abstract>This parameter defines the north-south resolution of the mapset in meter or degrees, which should be used to process the input and output raster data. To enable this setting, you need to specify north-south and east-west resolution.</ows:Abstract>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#float">float</ows:DataType>
+                    <ows:AnyValue/>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="1" maxOccurs="1">
+                <ows:Identifier>input</ows:Identifier>
+                <ows:Title>Name of input raster map</ows:Title>
+                <ComplexData>
+                    <Default>
+                        <Format>
+                            <MimeType>image/tiff</MimeType>
+                        </Format>
+                    </Default>
+                    <Supported>
+                        <Format>
+                            <MimeType>image/tiff</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>image/geotiff</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/geotiff</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/x-geotiff</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>image/png</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>image/gif</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>image/jpeg</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/x-erdas-hfa</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/netcdf</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/x-netcdf</MimeType>
+                        </Format>
+                    </Supported>
+                </ComplexData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>grass_band_number</ows:Identifier>
+                <ows:Title>Band to select for processing (default is all bands)</ows:Title>
+                <ows:Abstract>This parameter defines band number of the input raster files which should be processed. As default all bands are processed and used as single and multiple inputs for raster modules.</ows:Abstract>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#integer">integer</ows:DataType>
+                    <ows:AnyValue/>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>grass_resolution_ew</ows:Identifier>
+                <ows:Title>Resolution of the mapset in east-west direction in meters or degrees</ows:Title>
+                <ows:Abstract>This parameter defines the east-west resolution of the mapset in meters or degrees, which should be used to process the input and output raster data.  To enable this setting, you need to specify north-south and east-west resolution.</ows:Abstract>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#float">float</ows:DataType>
+                    <ows:AnyValue/>
+                </LiteralData>
+            </Input>
+            <Input minOccurs="0" maxOccurs="1">
+                <ows:Identifier>title</ows:Identifier>
+                <ows:Title>Title</ows:Title>
+                <LiteralData>
+                    <ows:DataType ows:reference="http://www.w3.org/TR/xmlschema-2/#string">string</ows:DataType>
+                    <ows:AnyValue/>
+                </LiteralData>
+            </Input>
+        </DataInputs>
+        <ProcessOutputs>
+            <Output>
+                <ows:Identifier>output</ows:Identifier>
+                <ows:Title>Name for output raster map</ows:Title>
+                <ComplexOutput>
+                    <Default>
+                        <Format>
+                            <MimeType>image/tiff</MimeType>
+                        </Format>
+                    </Default>
+                    <Supported>
+                        <Format>
+                            <MimeType>image/tiff</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>image/geotiff</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/geotiff</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/x-geotiff</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/x-erdas-hfa</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/netcdf</MimeType>
+                        </Format>
+                        <Format>
+                            <MimeType>application/x-netcdf</MimeType>
+                        </Format>
+                    </Supported>
+                </ComplexOutput>
+            </Output>
+        </ProcessOutputs>
+    </ProcessDescription>
+</wps:ProcessDescriptions>

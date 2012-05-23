@@ -30,41 +30,13 @@ import os
 import wpsclient
 from description import strProcessDescribe,processDescribe
 from cmdinterprete import ExecuteRequestStruct
-
-class ExecuteTest(TestCase):
-    
-    def setUp(self):
-        TestCase.setUp(self)
-        self.serveUrl = "http://localhost/cgi-bin/pywps.cgi"
-        self.testFileDirect = os.path.abspath("test/testxmlfile")
-        self.theXmlDoc = minidom.parse(os.path.join(self.testFileDirect, "v_buffer.xml"))
-        
-    def tearDown(self):
-        pass
-    
-    def testWrapInputParam(self):
-        # LiteralData
-        # ComplexData
-        complex = {}
-        # BoundingBox
-        boundingbox = {}
-        
-        wpsassess = wpsclient.WpsClient(self.serveUrl)
-        
-        inputxml = wpsassess._wrapInputParam(wpsassess.ProcessDescribe('v.buffer')[1],distance={'value':2}, type={'value':'area'})
-        
-        assertvalue = ""
-        
-        '''
-        http://localhost/cgi-bin/pywps.cgi?version=1.0.0&service=WPS&request=Execute&DataInputs=distance=20;type='area';input=@format=
-        
-        http://localhost/cgi-bin/pywps.cgi?version=1.0.0&service=WPS&request=Execute&identifier=v.buffer&DataInputs=input=ftp%3A%2f%2fzzpwelkin%3A2191307%2flocalhost%2fstreams.gml@mimetype=text/xml@encoding=utf-8@schema=http%3A%2F%2Fschemas.opengis.net%2Fgml%2F3.1.1%2Fbase/gml.xsd;distance=20&lineage=true
-        '''
-        
-        self.assertEqual(inputxml, assertvalue, msg)
-        pass
+from execute import *
         
 class CmdInterpreteTest(TestCase): 
+    
+    def runTest(self):
+        self.testSimpleCmd()
+        self.testChainRequestCmd()
     """
     命令行解释器测试用例
     """     
@@ -76,8 +48,8 @@ class CmdInterpreteTest(TestCase):
         request = ExecuteRequestStruct("http://localhost/cgi-bin/pywps.cgi")
         struct = request.getRequestStruct(cmd)
         cmpstruct = {'identifier': 'v.buffer', 
-                      'datainputs': [{'mimetype': 'text/xml', 'identifier': 'input', 'value': 'http://foo.map', 'encoding': 'utf-8'}, 
-                                     {'datatype': 'float', 'identifier': 'distance', 'value': '20'}],
+                      'datainputs': [{'mimetype': 'text/xml', 'identifier': 'input', 'value': 'http://foo.map', 'type': 1, 'encoding': 'utf-8'}, 
+                                     {'datatype': 'float', 'identifier': 'distance', 'type': 2, 'value': '20'}],
                       'responseform':
                         {'responsedocument': 
                          {'status': False, 'output': [{'identifier':'output','mimetype':'text/xml', 'asreference': False}], 'lineage': True, 'storeexecuteresponse': False}}}
@@ -96,22 +68,68 @@ class CmdInterpreteTest(TestCase):
                      {'responsedocument': 
                       {'status': False, 'output': [{'identifier':'output','mimetype':'text/xml','asreference': False}], 'lineage': True, 'storeexecuteresponse': False}}, 
                      'identifier': 'v.buffer', 
-                     'datainputs': [{'mimetype': 'text/xml', 'identifier': 'input', 'value': 
+                     'datainputs': [{'mimetype': 'text/xml', 'type': 1, 'identifier': 'input', 'value': 
                                      {'responseform':
                                       {'responsedocument':
                                        {'status': False, 'output': [], 'lineage': False, 'storeexecuteresponse': False}}, 
                                       'identifier': 'v.to.points', 
-                                      'datainputs': [{'mimetype': 'text/xml', 'identifier': 'input', 'value': 'http://foo.map'}]
+                                      'datainputs': [{'mimetype': 'text/xml', 'identifier': 'input', 'type': 1, 'value': 'http://foo.map'}]
                                       }, 
-                                     'encoding': 'utf-8'}, 
-                                    {'identifier': 'distance', 'value': '20'}
+                                     'type': 1, 'encoding': 'utf-8'}, 
+                                    {'identifier': 'distance', 'type': 2, 'value': '20'}
                                     ]
                      }
         print struct
         print cmpstruct
         self.assertEqual(struct, cmpstruct, "链请求解析")
+
+class ExecuteTest(TestCase):
+    """
+    Execute执行请求测试
+    """
+    def setUp(self):
+        self.theCmdInt = ExecuteRequestStruct("http://localhost/cgi-bin/pywps.cgi")
+        self.theExecuteResqObj = ExecuteRequest()
+        
+    def tearDown(self):
+        pass
     
+    def testWrapParam1(self):
+        """
+        简单的测试ComplexData和LiteralData格式的输入数据
+        """
+        cmd = "v.buffer --l input=http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
+        ResqStruct = self.theCmdInt.getRequestStruct(cmd)
+        comparaXML = ""
+        resqxml = self.theExecuteResqObj.wrapParam(ResqStruct['identifier'], 
+            ResqStruct['datainputs'], ResqStruct['responseform'])
+        print resqxml
+        self.assertEqual(resqxml, 
+            comparaXML, "")
+    def testWrapParam2(self):
+        """
+        测试输入为Reference类型的情况
+        """
+        cmd = "v.buffer --l input=@http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
+        ResqStruct = self.theCmdInt.getRequestStruct(cmd)
+        comparaXML = ""
+        resqxml = self.theExecuteResqObj.wrapParam(ResqStruct['identifier'], 
+            ResqStruct['datainputs'], ResqStruct['responseform'])
+        print resqxml
+        self.assertEqual(resqxml, 
+            comparaXML, "")
+    
+    def testWrapChainParam(self):
+        """
+        测试请求链XML文档封装的结果
+        """
+        cmd = "v.buffer --l input=[v.to.points -n input=http://foo.map@mimetype=text/xml]@mimetype=text/xml@encoding=utf-8 distance=20 output=@mimetype=text/xml"
+        ResqStruct = self.theCmdInt.getRequestStruct(cmd)
+        comparaXML = ""
+        resqxml = self.theExecuteResqObj.wrapParam(ResqStruct['identifier'], 
+            ResqStruct['datainputs'], ResqStruct['responseform'])
+        print resqxml
+        self.assertEqual(resqxml, comparaXML, "")
+
 if __name__=="__main__":
-    testsuite = TestSuite((CmdInterpreteTest))
-    
-    TextTestRunner().run(testsuite)
+    main()
