@@ -1,0 +1,94 @@
+>>> import os,sys,pprint
+>>> sys.path += [os.path.abspath('../../')]
+>>> from execute import *
+>>> request = ExecuteRequest("http://localhost/cgi-bin/pywps.cgi")
+
+# Test: ComplexData输入格式可访问的站点的数据. 如，WMS和WFS服务站点中的数据
+# 		cmd = "v.buffer --l input=http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
+
+>>> cmd = {'datainputs': [{'encoding': 'utf-8',
+...                 'identifier': 'input',
+...                 'mimetype': 'text/xml',
+...                 'type': 1,
+...                 'value': 'http://foo.map'},
+...                {'datatype': 'float',
+...                 'identifier': 'distance',
+...                 'type': 2,
+...                 'value': '20'}],
+... 'identifier': 'v.buffer', 
+... 'responseform': {'responsedocument': {'lineage': True,
+...                                       'output': [{'asreference': False,
+...                                                   'identifier': 'output',
+...                                                   'mimetype': 'text/xml'}],
+...                                       'status': False,
+...                                       'storeexecuteresponse': False}}}
+...                                    
+>>> pprint.pprint(request.wrapParam(cmd['identifier'], cmd['datainputs'], cmd['responseform']))
+'<wps:Execute service="WPS" version="1.0.0" xml:lang="en-CA"             xmlns:wps="http://www.opengis.net/wps/1.0.0"             xmlns:ows="http://www.opengis.net/ows/1.1"             xmlns:xlink="http://www.w3.org/1999/xlink"             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"             xsi:schemaLocation="http://www.opengis.net/wps/1.0.0../wpsExecute_request.xsd">             <ows:Identifier>v.buffer</ows:Identifier>\n<wps:DataInputs>\n<wps:Input>\n<ows:Identifier>input</ows:Identifier>\n<wps:Data>\n<wps:ComplexData  mimeType="text/xml"  encoding="utf-8" >\n http://foo.map </wps:ComplexData></wps:Data>\n</wps:Input>\n<wps:Input>\n<ows:Identifier>distance</ows:Identifier>\n<wps:Data>\n<wps:LiteralData dataType="float" >\n20</wps:LiteralData>\n</wps:Data>\n</wps:Input>\n</wps:DataInputs>\n<wps:ResponseForm>\n<wps:ResponseDocument storeExecuteResponse="false"  lineage="true"  status="false" >\n<wps:Output  asReference="false" >\n<ows:Identifier   mimeType="text/xml"  >output</ows:Identifier>\n</wps:Output>\n</wps:ResponseDocument>\n</wps:ResponseForm>\n</wps:Execute>'
+>>>
+>>> # Test: ComplexData输入格式为另一个Execute请求(即 请求链测试)
+>>> # 		cmd = "v.buffer --l input=[v.to.points -n input=http://foo.map@mimetype=text/xml]@mimetype=text/xml@encoding=utf-8 distance=20 output=@mimetype=text/xml"
+>>> cmd = {'datainputs': [{'encoding': 'utf-8',
+...                 'identifier': 'input',
+...                 'mimetype': 'text/xml',
+...                 'type': 1,
+...                 'value': {'datainputs': [{'identifier': 'input',
+...                                           'mimetype': 'text/xml',
+...                                           'type': 1,
+...                                           'value': 'http://foo.map'}],
+...                           'identifier': 'v.to.points',
+...                           'responseform': {'responsedocument': {'lineage': False,
+...                                                                 'output': [],
+...                                                                 'status': False,
+...                                                                 'storeexecuteresponse': False}}}},
+...                {'identifier': 'distance', 'type': 2, 'value': '20'}],
+... 'identifier': 'v.buffer',
+... 'responseform': {'responsedocument': {'lineage': True,
+...                                       'output': [{'asreference': False,
+...                                                   'identifier': 'output',
+...                                                   'mimetype': 'text/xml'}],
+...                                       'status': False,
+...                                       'storeexecuteresponse': False}}}
+>>> pprint.pprint(request.wrapParam(cmd['identifier'], cmd['datainputs'], cmd['responseform']))
+'<wps:Execute service="WPS" version="1.0.0" xml:lang="en-CA"             xmlns:wps="http://www.opengis.net/wps/1.0.0"             xmlns:ows="http://www.opengis.net/ows/1.1"             xmlns:xlink="http://www.w3.org/1999/xlink"             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"             xsi:schemaLocation="http://www.opengis.net/wps/1.0.0../wpsExecute_request.xsd">             <ows:Identifier>v.buffer</ows:Identifier>\n<wps:DataInputs>\n<wps:Input>\n<ows:Identifier>input</ows:Identifier>\n<wps:Data>\n<wps:ComplexData  mimeType="text/xml"  encoding="utf-8"  >\n <wps:Execute service="WPS" version="1.0.0" xml:lang="en-CA"             xmlns:wps="http://www.opengis.net/wps/1.0.0"             xmlns:ows="http://www.opengis.net/ows/1.1"             xmlns:xlink="http://www.w3.org/1999/xlink"             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"             xsi:schemaLocation="http://www.opengis.net/wps/1.0.0../wpsExecute_request.xsd">             <ows:Identifier>v.to.points</ows:Identifier>\n<wps:DataInputs>\n<wps:Input>\n<ows:Identifier>input</ows:Identifier>\n<wps:Data>\n<wps:ComplexData  mimeType="text/xml" >\n http://foo.map </wps:ComplexData></wps:Data>\n</wps:Input>\n</wps:DataInputs>\n<wps:ResponseForm>\n<wps:ResponseDocument storeExecuteResponse="false"  lineage="false"  status="false" >\n</wps:ResponseDocument>\n</wps:ResponseForm>\n</wps:Execute> </wps:ComplexData> </wps:Data>\n</wps:Input>\n<wps:Input>\n<ows:Identifier>distance</ows:Identifier>\n<wps:Data>\n<wps:LiteralData>\n20</wps:LiteralData>\n</wps:Data>\n</wps:Input>\n</wps:DataInputs>\n<wps:ResponseForm>\n<wps:ResponseDocument storeExecuteResponse="false"  lineage="true"  status="false" >\n<wps:Output  asReference="false" >\n<ows:Identifier   mimeType="text/xml"  >output</ows:Identifier>\n</wps:Output>\n</wps:ResponseDocument>\n</wps:ResponseForm>\n</wps:Execute>'
+>>> 
+>>> # Test: Reference输入格式
+>>> #		cmd = "v.buffer --l input=@xlink:href=http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
+>>> cmd = {'datainputs': [{'encoding': 'utf-8',
+...                 'identifier': 'input',
+...                 'mimetype': 'text/xml',
+...                 'type': 1,
+...                 'value': '',
+...                 'xlink:href': 'http://foo.map'},
+...                {'datatype': 'float',
+...                 'identifier': 'distance',
+...                 'type': 2,
+...                 'value': '20'}],
+... 'identifier': 'v.buffer',
+... 'responseform': {'responsedocument': {'lineage': True,
+...                                       'output': [{'asreference': False,
+...                                                   'identifier': 'output',
+...                                                   'mimetype': 'text/xml'}],
+...                                       'status': False,
+...                                       'storeexecuteresponse': False}}}
+>>> pprint.pprint(request.wrapParam(cmd['identifier'], cmd['datainputs'], cmd['responseform']))
+'<wps:Execute service="WPS" version="1.0.0" xml:lang="en-CA"             xmlns:wps="http://www.opengis.net/wps/1.0.0"             xmlns:ows="http://www.opengis.net/ows/1.1"             xmlns:xlink="http://www.w3.org/1999/xlink"             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"             xsi:schemaLocation="http://www.opengis.net/wps/1.0.0../wpsExecute_request.xsd">             <ows:Identifier>v.buffer</ows:Identifier>\n<wps:DataInputs>\n<wps:Input>\n<ows:Identifier>input</ows:Identifier>\n<wps:Data>\n<wps:Reference  mimeType="text/xml"  encoding="utf-8"  xlink:href="http://foo.map"> </wps:Reference>\n</wps:Data>\n</wps:Input>\n<wps:Input>\n<ows:Identifier>distance</ows:Identifier>\n<wps:Data>\n<wps:LiteralData dataType="float" >\n20</wps:LiteralData>\n</wps:Data>\n</wps:Input>\n</wps:DataInputs>\n<wps:ResponseForm>\n<wps:ResponseDocument storeExecuteResponse="false"  lineage="true"  status="false" >\n<wps:Output  asReference="false" >\n<ows:Identifier   mimeType="text/xml"  >output</ows:Identifier>\n</wps:Output>\n</wps:ResponseDocument>\n</wps:ResponseForm>\n</wps:Execute>'
+>>>
+>>> # Test: ComplexData输入格式为本地栅格和矢量文件
+>>> # 		cmd = "v.buffer --l input=file://./testdata/landcover.tiff distance=20@datatype=float output=@mimetype=text/xml"
+>>> cmd = {'datainputs': [{'identifier': 'input',
+...                 'type': 1,
+...                 'value': 'file://./testdata/streams_split/streams_cat__40120.shp'},
+...                {'datatype': 'float',
+...                 'identifier': 'distance',
+...                 'type': 2,
+...                 'value': '20'}],
+... 'identifier': 'v.buffer',
+... 'responseform': {'responsedocument': {'lineage': True,
+...                                       'output': [{'asreference': False,
+...                                                   'identifier': 'output',
+...                                                   'mimetype': 'text/xml'}],
+...                                       'status': False,
+...                                       'storeexecuteresponse': False}}}
+>>> pprint.pprint(request.wrapParam(cmd['identifier'], cmd['datainputs'], cmd['responseform']))                                       
+>>> # Test: ComplexData输入格式为ftp服务器上获取的栅格和矢量文件                                      

@@ -1,0 +1,74 @@
+>>> import os,sys,pprint
+>>> sys.path += [os.path.abspath('../')]
+>>> from execute import *
+>>> request = ExecuteRequest("http://localhost/cgi-bin/pywps.cgi")
+>>>
+>>> # test: 简单命令解析
+>>> cmd = "v.buffer --l input=http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
+>>> pprint.pprint(request.getRequestStruct(cmd))
+{'datainputs': [{'encoding': 'utf-8',
+                 'identifier': 'input',
+                 'mimetype': 'text/xml',
+                 'type': 1,
+                 'value': 'http://foo.map'},
+                {'datatype': 'float',
+                 'identifier': 'distance',
+                 'type': 2,
+                 'value': '20'}],
+ 'identifier': 'v.buffer',
+ 'responseform': {'responsedocument': {'lineage': True,
+                                       'output': [{'asreference': False,
+                                                   'identifier': 'output',
+                                                   'mimetype': 'text/xml'}],
+                                       'status': False,
+                                       'storeexecuteresponse': False}}}
+                                       
+>>>
+>>> # test: 链请求命令解析
+>>> cmd = "v.buffer --l input=[v.to.points -n input=http://foo.map@mimetype=text/xml]@mimetype=text/xml@encoding=utf-8 distance=20 output=@mimetype=text/xml"
+>>> pprint.pprint(request.getRequestStruct(cmd))
+{'datainputs': [{'encoding': 'utf-8',
+                 'identifier': 'input',
+                 'mimetype': 'text/xml',
+                 'type': 1,
+                 'value': {'datainputs': [{'identifier': 'input',
+                                           'mimetype': 'text/xml',
+                                           'type': 1,
+                                           'value': 'http://foo.map'}],
+                           'identifier': 'v.to.points',
+                           'responseform': {'responsedocument': {'lineage': False,
+                                                                 'output': [],
+                                                                 'status': False,
+                                                                 'storeexecuteresponse': False}}}},
+                {'identifier': 'distance', 'type': 2, 'value': '20'}],
+ 'identifier': 'v.buffer',
+ 'responseform': {'responsedocument': {'lineage': True,
+                                       'output': [{'asreference': False,
+                                                   'identifier': 'output',
+                                                   'mimetype': 'text/xml'}],
+                                       'status': False,
+                                       'storeexecuteresponse': False}}}
+
+>>> 
+>>> # test: 应用(Reference)数据请求解析
+>>> cmd = "v.buffer --l input=@xlink:href=http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
+>>> pprint.pprint(request.getRequestStruct(cmd))
+{'datainputs': [{'encoding': 'utf-8',
+                 'identifier': 'input',
+                 'mimetype': 'text/xml',
+                 'type': 1,
+                 'value': '',
+                 'xlink:href': 'http://foo.map'},
+                {'datatype': 'float',
+                 'identifier': 'distance',
+                 'type': 2,
+                 'value': '20'}],
+ 'identifier': 'v.buffer',
+ 'responseform': {'responsedocument': {'lineage': True,
+                                       'output': [{'asreference': False,
+                                                   'identifier': 'output',
+                                                   'mimetype': 'text/xml'}],
+                                       'status': False,
+                                       'storeexecuteresponse': False}}}
+
+>>>                                        

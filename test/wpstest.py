@@ -20,32 +20,32 @@ wpsclient.py Wps客户端库
   *                                                                         *
   ***************************************************************************/
 """
-
+import os,sys
+sys.path += [os.path.abspath('../')]
 from unittest import TestCase
 from unittest import TestSuite
 from unittest import TextTestRunner
 from unittest import main
 from xml.dom import minidom
-import os
+import logging
+
 import wpsclient
 from description import strProcessDescribe,processDescribe
-from cmdinterprete import ExecuteRequestStruct
 from execute import *
         
+logging.basicConfig(stream=sys.stdout, 
+                    level=logging.DEBUG)
+
 class CmdInterpreteTest(TestCase): 
-    
-    def runTest(self):
-        self.testSimpleCmd()
-        self.testChainRequestCmd()
     """
     命令行解释器测试用例
     """     
     def testSimpleCmd(self):
-        """
-        测试简单命令解析
+        """测试简单命令解析
         """
         cmd = "v.buffer --l input=http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
-        request = ExecuteRequestStruct("http://localhost/cgi-bin/pywps.cgi")
+        request = ExecuteRequest("http://localhost/cgi-bin/pywps.cgi")
+        struct = request.getRequestStruct(cmd)
         struct = request.getRequestStruct(cmd)
         cmpstruct = {'identifier': 'v.buffer', 
                       'datainputs': [{'mimetype': 'text/xml', 'identifier': 'input', 'value': 'http://foo.map', 'type': 1, 'encoding': 'utf-8'}, 
@@ -53,16 +53,16 @@ class CmdInterpreteTest(TestCase):
                       'responseform':
                         {'responsedocument': 
                          {'status': False, 'output': [{'identifier':'output','mimetype':'text/xml', 'asreference': False}], 'lineage': True, 'storeexecuteresponse': False}}}
-        print struct
-        print cmpstruct
+#        if __debug__:
+#            print struct
+#            print cmpstruct
         self.assertEqual(struct, cmpstruct, "简单命令解析")
         
     def testChainRequestCmd(self):
-        """
-        链请求命令解析
+        """链请求命令解析
         """
         cmd = "v.buffer --l input=[v.to.points -n input=http://foo.map@mimetype=text/xml]@mimetype=text/xml@encoding=utf-8 distance=20 output=@mimetype=text/xml"
-        request = ExecuteRequestStruct("http://localhost/cgi-bin/pywps.cgi")
+        request = ExecuteRequest("http://localhost/cgi-bin/pywps.cgi")
         struct = request.getRequestStruct(cmd)
         cmpstruct = {'responseform': 
                      {'responsedocument': 
@@ -79,8 +79,9 @@ class CmdInterpreteTest(TestCase):
                                     {'identifier': 'distance', 'type': 2, 'value': '20'}
                                     ]
                      }
-        print struct
-        print cmpstruct
+#        if __debug__:
+#            print struct
+#            print cmpstruct
         self.assertEqual(struct, cmpstruct, "链请求解析")
 
 class ExecuteTest(TestCase):
@@ -88,48 +89,144 @@ class ExecuteTest(TestCase):
     Execute执行请求测试
     """
     def setUp(self):
-        self.theCmdInt = ExecuteRequestStruct("http://localhost/cgi-bin/pywps.cgi")
-        self.theExecuteResqObj = ExecuteRequest()
+        self.request = ExecuteRequest("http://localhost/cgi-bin/pywps.cgi")
         
     def tearDown(self):
         pass
     
+    def _assertWrapXMLEqualtoFile(self, cmd, file): 
+        from xml.dom import minidom
+        wrapxml = minidom.parseString(self.request.wrapParam(cmd['identifier'], 
+                cmd['datainputs'], cmd['responseform'])).toprettyxml(newl='\n', encoding='utf-8')
+        logging.info(wrapxml)
+#        cmpxmlfile = open(file)
+#        self.assertEqual(cmpxmlfile.read(), wrapxml)
+        
     def testWrapParam1(self):
+        """ Test1: ComplexData输入格式可访问的站点的数据. 如，WMS和WFS服务站点中的数据
         """
-        简单的测试ComplexData和LiteralData格式的输入数据
-        """
-        cmd = "v.buffer --l input=http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
-        ResqStruct = self.theCmdInt.getRequestStruct(cmd)
-        comparaXML = ""
-        resqxml = self.theExecuteResqObj.wrapParam(ResqStruct['identifier'], 
-            ResqStruct['datainputs'], ResqStruct['responseform'])
-        print resqxml
-        self.assertEqual(resqxml, 
-            comparaXML, "")
+        cmd = {'datainputs': [{'encoding': 'utf-8',
+                         'identifier': 'input',
+                         'mimetype': 'text/xml',
+                         'type': 1,
+                         'value': 'http://foo.map'},
+                        {'datatype': 'float',
+                         'identifier': 'distance',
+                         'type': 2,
+                         'value': '20'}],
+         'identifier': 'v.buffer', 
+         'responseform': {'responsedocument': {'lineage': True,
+                                               'output': [{'asreference': False,
+                                                           'identifier': 'output',
+                                                           'mimetype': 'text/xml'}],
+                                               'status': False,
+                                               'storeexecuteresponse': False}}}
+        
+        self._assertWrapXMLEqualtoFile(cmd, 'ComplexData输入格式可访问的站点的数据.xml')
+        
     def testWrapParam2(self):
+        """ Test2: ComplexData输入格式为另一个Execute请求(即 请求链测试)
         """
-        测试输入为Reference类型的情况
+        cmd = {'datainputs': [{'encoding': 'utf-8',
+                 'identifier': 'input',
+                 'mimetype': 'text/xml',
+                 'type': 1,
+                 'value': {'datainputs': [{'identifier': 'input',
+                                           'mimetype': 'text/xml',
+                                           'type': 1,
+                                           'value': 'http://foo.map'}],
+                           'identifier': 'v.to.points',
+                           'responseform': {'responsedocument': {'lineage': False,
+                                                                 'output': [],
+                                                                 'status': False,
+                                                                 'storeexecuteresponse': False}}}},
+                {'identifier': 'distance', 'type': 2, 'value': '20'}],
+ 				'identifier': 'v.buffer',
+ 				'responseform': {'responsedocument': {'lineage': True,
+                                       'output': [{'asreference': False,
+                                                   'identifier': 'output',
+                                                   'mimetype': 'text/xml'}],
+                                        'status': False,
+                                        'storeexecuteresponse': False}}}
+        
+        self._assertWrapXMLEqualtoFile(cmd, 'ComplexData输入格式为另一个Execute请求.xml')
+        
+    def testWrapParam3(self):
+        """ Test3: Reference输入格式
         """
-        cmd = "v.buffer --l input=@http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
-        ResqStruct = self.theCmdInt.getRequestStruct(cmd)
-        comparaXML = ""
-        resqxml = self.theExecuteResqObj.wrapParam(ResqStruct['identifier'], 
-            ResqStruct['datainputs'], ResqStruct['responseform'])
-        print resqxml
-        self.assertEqual(resqxml, 
-            comparaXML, "")
-    
-    def testWrapChainParam(self):
+        cmd = {'datainputs': [{'encoding': 'utf-8',
+                 'identifier': 'input',
+                 'mimetype': 'text/xml',
+                 'type': 1,
+                 'value': '',
+                 'xlink:href': 'http://foo.map'},
+                {'datatype': 'float',
+                 'identifier': 'distance',
+                 'type': 2,
+                 'value': '20'}],
+ 				'identifier': 'v.buffer',
+ 				'responseform': {'responsedocument': {'lineage': True,
+                                       'output': [{'asreference': False,
+                                                   'identifier': 'output',
+                                                   'mimetype': 'text/xml'}],
+                                       'status': False,
+                                       'storeexecuteresponse': False}}}
+        
+        self._assertWrapXMLEqualtoFile(cmd, 'Reference输入格式.xml')
+        
+    def testWrapParam4(self):
+        """ Test4: ComplexData输入格式为本地矢量数据
         """
-        测试请求链XML文档封装的结果
+        datapath = os.path.abspath('testdata/streams_split/streams_cat__40120.shp')
+        cmd = {'datainputs': [{'identifier': 'input',
+                 'type': 1,
+                 'value': 'file://' + datapath},
+                {'datatype': 'float',
+                 'identifier': 'distance',
+                 'type': 2,
+                 'value': '20'}],
+ 				'identifier': 'v.buffer',
+ 				'responseform': {'responsedocument': {'lineage': True,
+                                       'output': [{'asreference': False,
+                                                   'identifier': 'output',
+                                                   'mimetype': 'text/xml'}],
+                                       'status': False,
+                                       'storeexecuteresponse': False}}}
+        self._assertWrapXMLEqualtoFile(cmd, 'ComplexData输入格式为本地矢量数据.xml')
+        
+    def testWrapParam5(self):
+        """ Test5: ComplexData输入格式为本地栅格数据
         """
-        cmd = "v.buffer --l input=[v.to.points -n input=http://foo.map@mimetype=text/xml]@mimetype=text/xml@encoding=utf-8 distance=20 output=@mimetype=text/xml"
-        ResqStruct = self.theCmdInt.getRequestStruct(cmd)
-        comparaXML = ""
-        resqxml = self.theExecuteResqObj.wrapParam(ResqStruct['identifier'], 
-            ResqStruct['datainputs'], ResqStruct['responseform'])
-        print resqxml
-        self.assertEqual(resqxml, comparaXML, "")
+        datapath = os.path.abspath('testdata/landcover.tiff')
+        cmd = {'datainputs': [{'identifier': 'input',
+                 'type': 1,
+                 'value': 'file://' + datapath},
+                {'datatype': 'float',
+                 'identifier': 'distance',
+                 'type': 2,
+                 'value': '20'}],
+                 'identifier': 'v.buffer',
+                 'responseform': {'responsedocument': {'lineage': True,
+                                       'output': [{'asreference': False,
+                                                   'identifier': 'output',
+                                                   'mimetype': 'text/xml'}],
+                                       'status': False,
+                                       'storeexecuteresponse': False}}}
+        self._assertWrapXMLEqualtoFile(cmd, 'ComplexData输入格式为本地栅格数据.xml')
 
+    
 if __name__=="__main__":
-    main()
+    #main()
+    testsuite1 = TestSuite()
+    testsuite1.addTest(CmdInterpreteTest("testSimpleCmd"))
+    testsuite1.addTest(CmdInterpreteTest("testChainRequestCmd"))
+    
+    testsuite2 = TestSuite()
+    testsuite2.addTest(ExecuteTest('testWrapParam1'))
+    testsuite2.addTest(ExecuteTest('testWrapParam2'))
+    testsuite2.addTest(ExecuteTest('testWrapParam3'))
+    testsuite2.addTest(ExecuteTest('testWrapParam4'))
+    testsuite2.addTest(ExecuteTest('testWrapParam5'))
+    
+    TextTestRunner().run(testsuite2)
+

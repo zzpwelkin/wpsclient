@@ -1,0 +1,24 @@
+<wps:Execute service="WPS" version="1.0.0" xml:lang="en-CA"             xmlns:wps="http://www.opengis.net/wps/1.0.0"             xmlns:ows="http://www.opengis.net/ows/1.1"             xmlns:xlink="http://www.w3.org/1999/xlink"             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"             xsi:schemaLocation="http://www.opengis.net/wps/1.0.0../wpsExecute_request.xsd">             <ows:Identifier>v.buffer</ows:Identifier>
+<wps:DataInputs>
+<wps:Input>
+<ows:Identifier>input</ows:Identifier>
+<wps:Data>
+<wps:ComplexData  mimeType="text/xml"  encoding="utf-8" >
+ http://foo.map </wps:ComplexData></wps:Data>
+</wps:Input>
+<wps:Input>
+<ows:Identifier>distance</ows:Identifier>
+<wps:Data>
+<wps:LiteralData dataType="float" >
+20</wps:LiteralData>
+</wps:Data>
+</wps:Input>
+</wps:DataInputs>
+<wps:ResponseForm>
+<wps:ResponseDocument storeExecuteResponse="false"  lineage="true"  status="false" >
+<wps:Output  asReference="false" >
+<ows:Identifier   mimeType="text/xml"  >output</ows:Identifier>
+</wps:Output>
+</wps:ResponseDocument>
+</wps:ResponseForm>
+</wps:Execute>

@@ -20,8 +20,6 @@ cmdinterprete.py Wps富客户端命令行解释器
   *                                                                         *
   ***************************************************************************/
   """
-from description import *
-from wpsclient import WpsClient
 import re
 
 class CmdParamToken(object):
@@ -63,6 +61,8 @@ class CmdParamToken(object):
           self.theCmd = cmd
           
     def getIdentifier(self):
+        if self.theCmd == '':
+            return None
         identifier = self.theCmd.split()[0]
         
         for sz in ['-', '=', '/', ':']:
@@ -120,102 +120,3 @@ class CmdParamToken(object):
                         
             yield param[0], param[1], param[2]
         
-class ExecuteRequestStruct(object):
-    """
-    将输入的命令转换为pywps中的存储结构
-    
-    Example:  
-        输入:"v.buffer --l input=http://foo.map@mimetype=text/xml@encoding=utf-8 distance=20@datatype=float output=@mimetype=text/xml"
-        输出:{'identifier': 'v.buffer', 
-                'datainputs': [{'mimetype': 'text/xml', 'identifier': 'input', 'value': 'http://foo.map', 'encoding': 'utf-8'}, 
-                                {'datatype': 'float', 'identifier': 'distance', 'value': '20'}],
-                'responseform':
-                    {'responsedocument': 
-                     {'status': False, 'output': [{'identifier':'output','mimetype':'text/xml', 'asreference': False}], 'lineage': True, 'storeexecuteresponse': False}}}
-        具体详细参数设置看处理描诉部分，用法可参考 CmdInterpreteTest 测试用例            
-    @return: 
-        返回数据结构为:{'identifier':(value), 
-              'datainputs':([{values},...])}
-              'responseform':{'responsedocument':{'status':False/True,'lineage': True/False, 'storeexecuteresponse': True/False, 'output':[{value,...}]}
-    
-    @note: 
-    """ 
-    def __init__(self, serveurl ):
-        self.theWpsclient = WpsClient(serveurl)
-    def getRequestStruct(self, cmd):
-        """
-        目前命令解译后，只支持{responsedocument}返回格式
-        """
-        def getInParams(params, paramId):
-            for param in params:
-                if param.theIdentifier == paramId:
-                    return param
-            return None
-        res = {'identifier':"", 'datainputs':[], 'responseform':{}}
-        res['responseform']['responsedocument'] = {}
-        res['responseform']['responsedocument']['output'] = []
-        res['responseform']['responsedocument']['status'] = False
-        res['responseform']['responsedocument']['storeexecuteresponse'] = False
-        res['responseform']['responsedocument']['lineage'] = False       
-        
-        cmdtoken = CmdParamToken(cmd)
-        res['identifier'] = cmdtoken.getIdentifier()
-        descstruct = self.theWpsclient.ProcessDescribe(res['identifier'])
-        
-        for paramId, value,attrpair in cmdtoken.getParamPair():
-            if paramId == "--m":
-                res['responseform']['storeexecuteresponse'] = True
-            elif paramId == "--s":
-                res['responseform']['status'] = True
-            elif paramId == "--l" :
-                res['responseform']['responsedocument']['lineage'] = True
-            elif getInParams(descstruct[1], paramId):
-                # 如果为输入参数
-                input = {}
-                input['identifier'] = paramId
-                inputparam = getInParams(descstruct[1], paramId)
-                if isinstance(inputparam.theInputForm,ComplexDataDef):
-                    # set value
-                    input['type'] = 1
-                    if not CmdParamToken(value).getIdentifier():
-                        input['value'] = value
-                    else:
-                        input['value'] = self.getRequestStruct(value)
-                    #set other attributes
-                    for key in ['encoding', 'mimetype', 'schema']:
-                        try:
-                            input[key] = attrpair[key]
-                        except:
-                                continue   
-                elif isinstance(inputparam.theInputForm, LiteralInputDef):
-                    input['type'] = 2
-                    input['identifier'] = paramId
-                    input['value'] = value
-                    try:
-                        input['datatype'] = attrpair['datatype']
-                    except:
-                        pass
-                    try:
-                        input['uom'] = attrpair['uom']
-                    except:
-                        pass
-                elif isinstance(inputparam, BoundingDataDef):
-                    input['type'] = 3
-                    input['value'] = value
-                res['datainputs'] += [input]
-            elif getInParams(descstruct[2], paramId):
-                # 如果为输入参数
-                output = {}
-                output['identifier'] = paramId
-                try:
-                    if attrpair['asreference'] and res['responseform']['storeexecuteresponse']:
-                        ouput['asreference'] = True
-                except:
-                    output['asreference'] = False
-                for key in ['encoding', 'mimetype', 'schema', 'uom', 'title', 'abstract']:
-                    try:
-                        output[key] = attrpair[key]
-                    except:
-                        continue
-                res['responseform']['responsedocument']['output'] += [output]
-        return res

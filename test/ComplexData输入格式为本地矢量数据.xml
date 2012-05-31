@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wps:Execute service="WPS" version="1.0.0" xml:lang="en-CA" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0../wpsExecute_request.xsd">
+	             
+	<ows:Identifier>
+		v.buffer
+	</ows:Identifier>
+	<wps:DataInputs>
+		<wps:Input>
+			<ows:Identifier>
+				input
+			</ows:Identifier>
+			<wps:Data>
+				<wps:ComplexData encoding="utf-8" mimeType="text/xml">
+					 
+					<ogr:FeatureCollection xmlns:gml="http://www.opengis.net/gml" xmlns:ogr="http://ogr.maptools.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ogr.maptools.org/ tmpKPzDugshp.xsd">
+						  
+						<gml:boundedBy>
+							    
+							<gml:Box>
+								      
+								<gml:coord>
+									<gml:X>
+										635640.0996697994
+									</gml:X>
+									<gml:Y>
+										217599.9822199309
+									</gml:Y>
+								</gml:coord>
+								      
+								<gml:coord>
+									<gml:X>
+										635684.9693720739
+									</gml:X>
+									<gml:Y>
+										217632.588569945
+									</gml:Y>
+								</gml:coord>
+								    
+							</gml:Box>
+							  
+						</gml:boundedBy>
+						                              
+						<gml:featureMember>
+							    
+							<ogr:streams_cat__40120 fid="F0">
+								      
+								<ogr:geometryProperty>
+									<gml:LineString>
+										<gml:coordinates>
+											635684.969372073886916,217601.057588679454057,0 635684.817881635972299,217599.982219930912834,0 635679.304953010403551,217602.005486375564942,0 635672.636525273090228,217605.719786604517139,0 635669.494640589458868,217607.647345659817802,0 635665.370383541099727,217609.866294100269442,0 635661.854203708353452,217612.098348964704201,0 635658.872339344816282,217614.355397473671474,0 635657.326695453491993,217615.552654271479696,0 635657.05816611694172,217615.836423638975248,0 635655.169621538952924,217617.808788382448256,0 635653.503886208171025,217619.181610329746036,0 635652.275844552437775,217620.251765269524185,0 635650.929540259181522,217622.075082515511895,0 635650.582067564129829,217622.866954496945255,0 635649.047091693966649,217624.651866868982324,0 635648.817272034357302,217625.001473170355894,0 635647.782169164391235,217626.696469357731985,0 635646.010972822783515,217628.105562577547971,0 635644.658572516986169,217629.604267175192945,0 635642.518872237764299,217631.348336263501551,0 635640.099669799441472,217632.588569945044583,0
+										</gml:coordinates>
+									</gml:LineString>
+								</ogr:geometryProperty>
+								      
+								<ogr:cat>
+									40120
+								</ogr:cat>
+								      
+								<ogr:FNODE_>
+									42063
+								</ogr:FNODE_>
+								      
+								<ogr:TNODE_>
+									42061
+								</ogr:TNODE_>
+								      
+								<ogr:LPOLY_>
+									2
+								</ogr:LPOLY_>
+								      
+								<ogr:RPOLY_>
+									2
+								</ogr:RPOLY_>
+								      
+								<ogr:LENGTH>
+									188
+								</ogr:LENGTH>
+								      
+								<ogr:FULL_HYDRO>
+									40120
+								</ogr:FULL_HYDRO>
+								      
+								<ogr:FULL_HYD_1>
+									84878
+								</ogr:FULL_HYD_1>
+								      
+								<ogr:FTYPE>
+									STREAM/RIVER
+								</ogr:FTYPE>
+								      
+								<ogr:FCODE>
+									46000
+								</ogr:FCODE>
+								      
+								<ogr:I_vs_P>
+									perennial
+								</ogr:I_vs_P>
+								      
+								<ogr:USGSstrm>
+									usgs_stream
+								</ogr:USGSstrm>
+								    
+							</ogr:streams_cat__40120>
+							  
+						</gml:featureMember>
+					</ogr:FeatureCollection>
+					 
+				</wps:ComplexData>
+			</wps:Data>
+		</wps:Input>
+		<wps:Input>
+			<ows:Identifier>
+				distance
+			</ows:Identifier>
+			<wps:Data>
+				<wps:LiteralData dataType="float">
+					20
+				</wps:LiteralData>
+			</wps:Data>
+		</wps:Input>
+	</wps:DataInputs>
+	<wps:ResponseForm>
+		<wps:ResponseDocument lineage="true" status="false" storeExecuteResponse="false">
+			<wps:Output asReference="false">
+				<ows:Identifier mimeType="text/xml">
+					output
+				</ows:Identifier>
+			</wps:Output>
+		</wps:ResponseDocument>
+	</wps:ResponseForm>
+</wps:Execute>

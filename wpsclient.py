@@ -103,7 +103,7 @@ class WpsClient(object):
         if not self.theProcessesSupported.has_key(identifier):
             self.theProcessesSupported[identifier] = processDescribe(self._getWPSServiceXML(
                 'DescribeProcess',identifier))
-            return self.theProcessesSupported[identifier]
+        return self.theProcessesSupported[identifier]
 
     def ReadableProcessDescribe(self,identifier):
         return strProcessDescribe(self.ProcessDescribe(identifier))
@@ -150,3 +150,4 @@ if __name__ == "__main__":
 #        print wps.strProcessDescribe(wps.ProcessDescribe(brief[0]))
     print wps.ReadableProcessDescribe('v.buffer')
     print wps.ReadableProcessDescribe('v.to.points')
+    print wps.ReadableProcessDescribe('r.clump')
